@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -127,6 +128,29 @@ public class OrderService {
                 .map(OrderItem::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         order.setTotalAmount(total);
+    }
+
+    public OrderResponse toResponse(Order order) {
+        List<OrderItemResponse> itemResponses = order.getItems().stream()
+                .map(item -> OrderItemResponse.builder()
+                        .id(item.getId())
+                        .productId(item.getProduct().getId())
+                        .productName(item.getProduct().getName())
+                        .quantity(item.getQuantity())
+                        .unitPrice(item.getUnitPrice())
+                        .subtotal(item.getSubTotal())
+                        .build())
+                .collect(Collectors.toList());
+
+        return OrderResponse.builder()
+                .id(order.getId())
+                .customerId(order.getCustomer().getId())
+                .customerName(order.getCustomer().getFirstName() + " " + order.getCustomer().getLastName())
+                .status(order.getStatus())
+                .totalAmount(order.getTotalAmount())
+                .items(itemResponses)
+                .createdAt(order.getCreatedAt())
+                .build();
     }
 
 }

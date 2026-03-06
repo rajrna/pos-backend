@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -16,45 +17,51 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAll(){
-        return new ResponseEntity<>(orderService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<OrderResponse>> getAll(){
+        return ResponseEntity.ok(orderService.findAll().stream()
+                .map(orderService::toResponse)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getById(@PathVariable Long id) {
-        return new ResponseEntity<>(orderService.findById(id), HttpStatus.OK);
+    public ResponseEntity<OrderResponse> getById(@PathVariable Long id) {
+//        return new ResponseEntity<>(orderService.findById(id), HttpStatus.OK);
+        return  ResponseEntity.ok(orderService.toResponse(orderService.findById(id)));
     }
+
 
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<Order>> getByCustomer(@PathVariable Long customerId){
-        return new ResponseEntity<>(orderService.findByCustomerId(customerId), HttpStatus.OK);
+//        return new ResponseEntity<>(orderService.findByCustomerId(customerId), HttpStatus.OK);
+        return ResponseEntity.ok(orderService.findByCustomerId(customerId));
     }
 
     @GetMapping("/status/{status}")
     public  ResponseEntity<List<Order>> getByStatus(@PathVariable OrderStatus status){
-        return new ResponseEntity<>(orderService.findByStatus(status), HttpStatus.OK);
+        return ResponseEntity.ok(orderService.findByStatus(status));
     }
 
     @PostMapping
-    public ResponseEntity<Order> create(@RequestBody @Valid OrderRequest request){
-        return new ResponseEntity<>(orderService.create(request), HttpStatus.CREATED);
+    public ResponseEntity<OrderResponse> create(@RequestBody @Valid OrderRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(orderService.toResponse(orderService.create(request)));
     }
 
     @PostMapping("/{orderId}/items")
-    public ResponseEntity<Order> addItem(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponse> addItem(@PathVariable Long orderId,
                                          @RequestBody @Valid OrderItemRequest request){
-        return new ResponseEntity<>(orderService.addItem(orderId, request), HttpStatus.OK);
+        return ResponseEntity.ok(orderService.toResponse(orderService.addItem(orderId,request)));
     }
 
     @DeleteMapping("/{orderId}/items/{itemId}")
-    public ResponseEntity<Order> removeItem(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponse> removeItem(@PathVariable Long orderId,
                                             @PathVariable Long itemId){
-        return new ResponseEntity<>(orderService.removeItem(orderId, itemId), HttpStatus.OK);
+        return ResponseEntity.ok(orderService.toResponse(orderService.removeItem(orderId, itemId)));
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Order> updateStatus(@PathVariable Long id, @RequestBody OrderStatus status){
-        return  new ResponseEntity<>(orderService.updateStatus(id, status), HttpStatus.OK);
+    public ResponseEntity<OrderResponse> updateStatus(@PathVariable Long id, @RequestBody OrderStatus status){
+        return ResponseEntity.ok(orderService.toResponse(orderService.updateStatus(id, status)));
     }
 
     @DeleteMapping
