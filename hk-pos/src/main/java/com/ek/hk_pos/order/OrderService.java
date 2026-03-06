@@ -2,6 +2,8 @@ package com.ek.hk_pos.order;
 
 import com.ek.hk_pos.customer.Customer;
 import com.ek.hk_pos.customer.CustomerRepository;
+import com.ek.hk_pos.exception.BadRequestException;
+import com.ek.hk_pos.exception.ResourceNotFoundException;
 import com.ek.hk_pos.product.Product;
 import com.ek.hk_pos.product.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -26,7 +28,7 @@ public class OrderService {
 
     public Order findById(Long id){
         return orderRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Order not found with id: "+ id));
+                .orElseThrow(()-> new ResourceNotFoundException("Order not found with id: "+ id));
     }
 
     public List<Order> findByCustomerId(Long customerId) {
@@ -39,7 +41,7 @@ public class OrderService {
 
     public Order create(OrderRequest request){
         Customer customer = customerRepository.findById(request.getCustomerId())
-                .orElseThrow(()->new RuntimeException("Customer not found with id: "+ request.getCustomerId()));
+                .orElseThrow(()->new ResourceNotFoundException("Customer not found with id: "+ request.getCustomerId()));
 
         Order order = Order.builder()
                 .customer(customer)
@@ -54,14 +56,14 @@ public class OrderService {
         Order order = findById(orderId);
 
         if(order.getStatus() != OrderStatus.PENDING){
-            throw new RuntimeException("Cannot modify an order that is not PENDING");
+            throw new BadRequestException("Cannot modify an order that is not PENDING");
         }
 
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(()->new RuntimeException("Product not found with id: "+ request.getProductId()));
+                .orElseThrow(()->new ResourceNotFoundException("Product not found with id: "+ request.getProductId()));
 
         if(product.getStockQuantity() < request.getQuantity()){
-            throw new RuntimeException("Insufficient stock for product:" + product.getName());
+            throw new BadRequestException("Insufficient stock for product:" + product.getName());
         }
 
         OrderItem existingItem = order.getItems().stream()
@@ -92,13 +94,13 @@ public class OrderService {
         Order order = findById(orderId);
 
         if(order.getStatus() != OrderStatus.PENDING){
-            throw new RuntimeException("Cannot modify and order that is not PENDING");
+            throw new BadRequestException("Cannot modify and order that is not PENDING");
         }
 
         OrderItem item = order.getItems().stream()
                 .filter(i->i.getId().equals(itemId))
                 .findFirst()
-                .orElseThrow(()-> new RuntimeException("Item not found with id: "+ itemId));
+                .orElseThrow(()-> new ResourceNotFoundException("Item not found with id: "+ itemId));
 
         Product product = item.getProduct();
         product.setStockQuantity(product.getStockQuantity()+ item.getQuantity());

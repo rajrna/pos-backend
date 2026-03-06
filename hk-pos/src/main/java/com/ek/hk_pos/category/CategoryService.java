@@ -1,5 +1,6 @@
 package com.ek.hk_pos.category;
 
+import com.ek.hk_pos.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class CategoryService {
     }
 
     public Category findById(Long id){
-        return categoryRepository.findById(id).orElseThrow(()->new RuntimeException("Category not found with id: "+id));
+        return categoryRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Category not found with id: "+id));
     }
 
     public Category create(Category category){

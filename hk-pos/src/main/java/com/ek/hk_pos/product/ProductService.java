@@ -2,6 +2,7 @@ package com.ek.hk_pos.product;
 
 import com.ek.hk_pos.category.Category;
 import com.ek.hk_pos.category.CategoryRepository;
+import com.ek.hk_pos.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class ProductService {
     }
 
     public Product findById(Long id){
-        return  productRepository.findById(id).orElseThrow(()-> new RuntimeException("Product not found with id: "+ id));
+        return  productRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Product not found with id: "+ id));
     }
 
     public List<Product> findByCategoryId(Long categoryId){
@@ -32,7 +33,7 @@ public class ProductService {
 
     public Product create(ProductRequest request){
 
-        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(()-> new RuntimeException("Category not found with id:" + request.getCategoryId()));
+        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(()-> new ResourceNotFoundException("Category not found with id:" + request.getCategoryId()));
 
         Product product = Product.builder()
                 .name(request.getName())
@@ -50,7 +51,7 @@ public class ProductService {
         Product existing = findById(id);
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(()->new RuntimeException("Category not found with id: "+ request.getCategoryId()));
+                .orElseThrow(()->new ResourceNotFoundException("Category not found with id: "+ request.getCategoryId()));
 
         existing.setName(request.getName());
         existing.setDescription(request.getDescription());

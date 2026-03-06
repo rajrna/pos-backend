@@ -1,5 +1,8 @@
 package com.ek.hk_pos.payment;
 
+import com.ek.hk_pos.exception.BadRequestException;
+import com.ek.hk_pos.exception.DuplicateResourceException;
+import com.ek.hk_pos.exception.ResourceNotFoundException;
 import com.ek.hk_pos.invoice.Invoice;
 import com.ek.hk_pos.invoice.InvoiceRepository;
 import com.ek.hk_pos.order.Order;
@@ -28,19 +31,19 @@ public class PaymentService {
 
     public Payment findById(Long id){
         return paymentRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("Payment not found with id: "+id));
+                .orElseThrow(()->new ResourceNotFoundException("Payment not found with id: "+id));
     }
 
     public Payment processPayment(PaymentRequest request){
         Order order = orderRepository.findById(request.getOrderId()).
-                orElseThrow(()->new RuntimeException("Order not found with id: "+request.getOrderId()));
+                orElseThrow(()->new ResourceNotFoundException("Order not found with id: "+request.getOrderId()));
 
         if(order.getStatus()!= OrderStatus.CONFIRMED){
-            throw new RuntimeException("Order must be CONFIRMED before payment");
+            throw new BadRequestException("Order must be CONFIRMED before payment");
         }
 
         if(paymentRepository.findByOrderId(order.getId()).isPresent()){
-            throw new RuntimeException(("Payment already exists for order: "+order.getId()));
+            throw new DuplicateResourceException(("Payment already exists for order: "+order.getId()));
         }
 
         Payment payment = Payment.builder()
@@ -82,12 +85,12 @@ public class PaymentService {
 
     public Invoice findInvoiceByOrderId(Long orderId) {
         return invoiceRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new RuntimeException("Invoice not found for order: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for order: " + orderId));
     }
 
     public Invoice findInvoiceByNumber(String invoiceNumber) {
         return invoiceRepository.findByInvoiceNumber(invoiceNumber)
-                .orElseThrow(() -> new RuntimeException("Invoice not found: " + invoiceNumber));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found: " + invoiceNumber));
     }
 
     public void generateInvoice(Order order, Payment payment){

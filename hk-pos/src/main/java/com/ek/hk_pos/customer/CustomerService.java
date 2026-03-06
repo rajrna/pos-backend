@@ -1,5 +1,7 @@
 package com.ek.hk_pos.customer;
 
+import com.ek.hk_pos.exception.DuplicateResourceException;
+import com.ek.hk_pos.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +19,7 @@ public class CustomerService {
 
     public Customer findById(Long id){
         return  customerRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Customer not found with id: "+ id));
+                .orElseThrow(()-> new ResourceNotFoundException("Customer not found with id: "+ id));
     }
 
     public List<Customer> search(String query){
@@ -26,7 +28,7 @@ public class CustomerService {
 
     public Customer create(CustomerRequest request){
         if (customerRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new RuntimeException("User with email already exists: "+ request.getEmail());
+            throw new DuplicateResourceException("User with email already exists: "+ request.getEmail());
         }
 
         Customer customer = Customer.builder()
@@ -44,7 +46,7 @@ public class CustomerService {
 
         if(!existing.getEmail().equals(request.getEmail()) &&
             customerRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new RuntimeException("Email already exists: " + request.getEmail());
+            throw new DuplicateResourceException("Email already exists: " + request.getEmail());
         }
 
         existing.setFirstName(request.getFirstName());
