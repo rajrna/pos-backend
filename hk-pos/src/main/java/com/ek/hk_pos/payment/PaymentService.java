@@ -38,13 +38,14 @@ public class PaymentService {
         Order order = orderRepository.findById(request.getOrderId()).
                 orElseThrow(()->new ResourceNotFoundException("Order not found with id: "+request.getOrderId()));
 
+        if(paymentRepository.findByOrderId(order.getId()).isPresent()){
+            throw new DuplicateResourceException(("Payment already exists for order: "+order.getId()));
+        }
+
         if(order.getStatus()!= OrderStatus.CONFIRMED){
             throw new BadRequestException("Order must be CONFIRMED before payment");
         }
 
-        if(paymentRepository.findByOrderId(order.getId()).isPresent()){
-            throw new DuplicateResourceException(("Payment already exists for order: "+order.getId()));
-        }
 
         Payment payment = Payment.builder()
                 .order(order)

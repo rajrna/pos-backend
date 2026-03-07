@@ -16,32 +16,32 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<Product>> getAll(){
-        return new ResponseEntity<>(productService.findAll(), HttpStatus.OK);
+        return ResponseEntity.ok(productService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable Long id){
-        return new ResponseEntity<>(productService.findById(id), HttpStatus.OK);
+        return ResponseEntity.ok(productService.findById(id));
     }
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<Product>> getByCategory(@PathVariable Long categoryId){
-        return new ResponseEntity<>(productService.findByCategoryId(categoryId), HttpStatus.OK);
+        return ResponseEntity.ok(productService.findByCategoryId(categoryId));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<Product>> search(@RequestParam String name){
-        return new ResponseEntity<>(productService.searchByName(name), HttpStatus.OK);
+        return ResponseEntity.ok(productService.searchByName(name));
     }
 
     @PostMapping
     public ResponseEntity<Product> create(@RequestBody ProductRequest request){
-        return  new ResponseEntity<>(productService.create(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(request));
     }
 
     @PutMapping("/{id}")
     public  ResponseEntity<Product> update(@PathVariable Long id, @RequestBody ProductRequest request){
-        return new ResponseEntity<>(productService.update(id, request), HttpStatus.OK);
+        return ResponseEntity.ok(productService.update(id, request));
     }
 
     @DeleteMapping("/{id}")

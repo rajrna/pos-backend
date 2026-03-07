@@ -17,27 +17,28 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<List<Customer>> getAll(){
-        return new ResponseEntity<>(customerService.findAll(), HttpStatus.OK);
+//        return new ResponseEntity<>(customerService.findAll(), HttpStatus.OK);
+        return ResponseEntity.ok(customerService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getById(@PathVariable Long id){
-        return  new ResponseEntity<>(customerService.findById(id), HttpStatus.OK);
+        return ResponseEntity.ok(customerService.findById(id));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<Customer>> search(@RequestParam String query){
-        return new ResponseEntity<>(customerService.search(query), HttpStatus.OK);
+        return ResponseEntity.ok(customerService.search(query));
     }
 
     @PostMapping
     public ResponseEntity<Customer> create(@RequestBody @Valid CustomerRequest request){
-        return  new ResponseEntity<>(customerService.create(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> update(@PathVariable Long id, @RequestBody @Valid CustomerRequest request){
-        return new ResponseEntity<>(customerService.update(id, request), HttpStatus.OK);
+        return ResponseEntity.ok(customerService.update(id,request));
     }
 
     @DeleteMapping("/{id}")

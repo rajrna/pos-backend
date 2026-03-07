@@ -18,41 +18,44 @@ public class PaymentController {
 
     @GetMapping
     public ResponseEntity<List<Payment>> getAll(){
-        return  new ResponseEntity<>(paymentService.findAll(), HttpStatus.OK);
+//        return  new ResponseEntity<>(paymentService.findAll(), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Payment> getById(@PathVariable Long id){
-        return new ResponseEntity<>(paymentService.findById(id), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.findById(id));
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Payment>> getByStatus(@PathVariable PaymentStatus status){
-        return new ResponseEntity<>(paymentService.findByStatus(status), HttpStatus.OK);
+//        return new ResponseEntity<>(paymentService.findByStatus(status), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.findByStatus(status));
     }
 
     @GetMapping("/method/{method}")
     public ResponseEntity<List<Payment>> getByMethod(@PathVariable PaymentMethod method){
-        return new ResponseEntity<>(paymentService.findByMethod(method), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.findByMethod(method));
     }
 
     @PostMapping("/process")
     public ResponseEntity<Payment> process(@RequestBody @Valid PaymentRequest request){
-        return new ResponseEntity<>(paymentService.processPayment(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.OK).body(paymentService.processPayment(request));
     }
 
     @PatchMapping("/{id}/fail")
     public ResponseEntity<Payment> fail(@PathVariable Long id){
-        return new ResponseEntity<>(paymentService.failPayment(id), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.failPayment(id));
     }
 
     @GetMapping("/invoices/order/{orderId}")
     public ResponseEntity<Invoice> getInvoiceByOrder(@PathVariable Long orderId){
-        return new ResponseEntity<>(paymentService.findInvoiceByOrderId(orderId), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.findInvoiceByOrderId(orderId));
     }
 
     @GetMapping("/invoices/{invoiceNumber}")
     public ResponseEntity<Invoice> getInvoiceByNumber(@PathVariable String invoiceNumber){
-        return new ResponseEntity<>(paymentService.findInvoiceByNumber(invoiceNumber), HttpStatus.OK);
+
+        return ResponseEntity.ok(paymentService.findInvoiceByNumber(invoiceNumber));
     }
 }
